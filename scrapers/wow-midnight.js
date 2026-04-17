@@ -1,4 +1,18 @@
 const { upsertPrice } = require('./supabase')
+const https = require('https')
+
+function getEurUsdRate() {
+  return new Promise((resolve) => {
+    https.get('https://open.er-api.com/v6/latest/EUR', (res) => {
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        try { resolve(JSON.parse(data).rates?.USD ?? 1.08) }
+        catch { resolve(1.08) }
+      })
+    }).on('error', () => resolve(1.08))
+  })
+}
 
 const LISTING_URL =
   'https://www.g2g.com/categories/wow-gold?region_id=dfced32f-2f0a-4df5-a218-1e068cfadffa&fa=lgc_2299_platform%3Algc_2299_platform_39978,lgc_2299_platform_39980,lgc_2299_platform_39982,lgc_2299_platform_39984,lgc_2299_platform_39986,lgc_2299_platform_39988'
@@ -44,7 +58,9 @@ async function runWowMidnight(browser) {
         : null
 
       const price = parseFloat(priceSpan?.innerText?.trim() ?? '')
-      if (title && !isNaN(price)) results.push({ title, price })
+      const spans = card ? [...card.querySelectorAll('span')].map(s => s.innerText?.trim()) : []
+      const currency = spans.find(s => /^(USD|EUR|GBP)$/.test(s)) ?? 'USD'
+      if (title && !isNaN(price)) results.push({ title, price, currency })
     }
     return results
   })
@@ -57,17 +73,25 @@ async function runWowMidnight(browser) {
 
   console.log(`  Cards encontrados: ${cards.length}`)
 
+  const detectedCurrency = cards[0]?.currency ?? 'USD'
+  let eurUsd = 1
+  if (detectedCurrency === 'EUR') {
+    eurUsd = await getEurUsdRate()
+    console.log(`  [INFO] Moneda detectada: EUR → convirtiendo a USD (tasa: ${eurUsd.toFixed(4)})`)
+  }
+
   for (let i = 0; i < cards.length; i++) {
-    const { title, price } = cards[i]
+    const { title, price, currency } = cards[i]
+    const priceUsd = currency === 'EUR' ? parseFloat((price * eurUsd).toFixed(6)) : price
     const server = `card_${i + 1}`
-    console.log(`  ${server}: ${title} → $${price}`)
+    console.log(`  ${server}: ${title} → $${priceUsd}`)
 
     try {
       await upsertPrice({
         game: 'wow_midnight',
         server,
         region: 'US',
-        price_usd: price,
+        price_usd: priceUsd,
         raw_data: { server_name: title, source: 'g2g.com' },
       })
     } catch (err) {
