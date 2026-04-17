@@ -16,7 +16,13 @@ async function runWowMidnight(browser) {
     Object.defineProperty(navigator, 'webdriver', { get: () => undefined })
   })
 
-  await page.goto(LISTING_URL, { waitUntil: 'domcontentloaded', timeout: 30000 })
+  // Forzar moneda USD independiente del IP del servidor
+  await context.addCookies([
+    { name: 'currency_code', value: 'USD', domain: 'www.g2g.com', path: '/' },
+    { name: 'currency',      value: 'USD', domain: 'www.g2g.com', path: '/' },
+  ])
+
+  await page.goto(LISTING_URL + '&currency=USD', { waitUntil: 'domcontentloaded', timeout: 30000 })
   await page.waitForSelector('.text-body1.ellipsis-2-lines', { timeout: 15000 })
   await page.waitForTimeout(3000)
 

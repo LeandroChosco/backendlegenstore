@@ -78,6 +78,12 @@ async function runWowTbc(browser) {
     Object.defineProperty(navigator, 'webdriver', { get: () => undefined })
   })
 
+  // Forzar moneda USD independiente del IP del servidor
+  await context.addCookies([
+    { name: 'currency_code', value: 'USD', domain: 'www.g2g.com', path: '/' },
+    { name: 'currency',      value: 'USD', domain: 'www.g2g.com', path: '/' },
+  ])
+
   for (const server of TARGETS) {
     try {
       const { price_usd, raw_data } = await scrapeVendorPrices(page, server)
