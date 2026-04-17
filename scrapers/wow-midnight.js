@@ -30,11 +30,7 @@ async function runWowMidnight(browser) {
       if (!titleEl) break
 
       const title = titleEl.innerText?.trim()
-
-      // Subir al contenedor del card (link o article padre)
       const card = titleEl.closest('a') || titleEl.closest('article') || titleEl.parentElement?.parentElement?.parentElement
-
-      // Buscar el precio dentro de ese card
       const priceSpan = card
         ? [...card.querySelectorAll('span')].find(
             el => /^\d+\.\d+$/.test(el.innerText?.trim()) && el.children.length === 0
@@ -42,7 +38,6 @@ async function runWowMidnight(browser) {
         : null
 
       const price = parseFloat(priceSpan?.innerText?.trim() ?? '')
-
       if (title && !isNaN(price)) results.push({ title, price })
     }
     return results
