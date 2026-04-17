@@ -82,7 +82,8 @@ async function runWowMidnight(browser) {
 
   for (let i = 0; i < cards.length; i++) {
     const { title, price, currency } = cards[i]
-    const priceUsd = currency === 'EUR' ? parseFloat((price * eurUsd).toFixed(6)) : price
+    const rawUsd = currency === 'EUR' ? price * eurUsd : price
+    const priceUsd = parseFloat((rawUsd * 0.98).toFixed(6))
     const server = `card_${i + 1}`
     console.log(`  ${server}: ${title} → $${priceUsd}`)
 
