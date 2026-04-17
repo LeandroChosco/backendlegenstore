@@ -20,16 +20,29 @@ async function runWowMidnight(browser) {
   await page.waitForSelector('.text-body1.ellipsis-2-lines', { timeout: 15000 })
   await page.waitForTimeout(3000)
 
-  // Extraer los primeros 4 cards: título + precio
+  // Extraer los primeros 4 cards: título + precio buscando dentro del mismo card
   const cards = await page.evaluate(() => {
     const titleEls = [...document.querySelectorAll('.text-body1.ellipsis-2-lines span')]
-    const priceEls = [...document.querySelectorAll('span')]
-      .filter(el => /^\d+\.\d+$/.test(el.innerText?.trim()) && el.children.length === 0)
-
     const results = []
+
     for (let i = 0; i < 4; i++) {
-      const title = titleEls[i]?.innerText?.trim()
-      const price = parseFloat(priceEls[i]?.innerText?.trim())
+      const titleEl = titleEls[i]
+      if (!titleEl) break
+
+      const title = titleEl.innerText?.trim()
+
+      // Subir al contenedor del card (link o article padre)
+      const card = titleEl.closest('a') || titleEl.closest('article') || titleEl.parentElement?.parentElement?.parentElement
+
+      // Buscar el precio dentro de ese card
+      const priceSpan = card
+        ? [...card.querySelectorAll('span')].find(
+            el => /^\d+\.\d+$/.test(el.innerText?.trim()) && el.children.length === 0
+          )
+        : null
+
+      const price = parseFloat(priceSpan?.innerText?.trim() ?? '')
+
       if (title && !isNaN(price)) results.push({ title, price })
     }
     return results
