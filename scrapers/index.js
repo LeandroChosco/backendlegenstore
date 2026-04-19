@@ -10,23 +10,17 @@ async function runAll() {
   console.log(`Scraper iniciado: ${new Date().toISOString()}`)
   console.log(`========================================`)
 
-  // RuneScape no necesita browser — corre primero
-  try {
-    await runRunescape()
-  } catch (err) {
-    console.error('[RuneScape] FALLÓ:', err.message)
-  }
-
-  // WoW scrapers comparten una instancia de Chromium
+  // Todos los scrapers comparten una instancia de Chrome
   let browser
   try {
-    console.log('\nIniciando Chromium (headless)...')
+    console.log('\nIniciando Chrome (headless)...')
     browser = await chromium.launch({
       headless: true,
       channel: 'chrome',
       args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
     })
 
+    await runRunescape(browser)
     await runWowTbc(browser)
     await runWowMidnight(browser)
 
