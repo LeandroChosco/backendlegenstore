@@ -1,0 +1,29 @@
+services:
+  # Panel de admin + API de precios
+  - type: web
+    name: legendstore-backend
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+
+  # Scraper de precios — se ejecuta cada 10 minutos
+  - type: cron
+    name: legendstore-scraper
+    runtime: docker
+    schedule: "*/10 * * * *"
+    dockerCommand: node scrapers/index.js
+    envVars:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
