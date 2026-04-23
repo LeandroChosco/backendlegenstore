@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateAlbionPrice } from './actions/prices'
 
 interface Props {
@@ -15,6 +15,16 @@ export default function AlbionPriceForm({ type, label, currentPrice, updatedAt }
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [formattedDate, setFormattedDate] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (updatedAt) {
+      setFormattedDate(new Date(updatedAt).toLocaleString('es-AR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      }))
+    }
+  }, [updatedAt])
 
   async function handleSave() {
     const price = parseFloat(value)
@@ -32,10 +42,6 @@ export default function AlbionPriceForm({ type, label, currentPrice, updatedAt }
       setSaving(false)
     }
   }
-
-  const formattedDate = updatedAt
-    ? new Date(updatedAt).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : null
 
   return (
     <div style={s.card}>
