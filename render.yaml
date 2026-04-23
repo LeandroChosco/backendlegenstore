@@ -4,6 +4,9 @@ services:
     name: legendstore-backend
     runtime: docker
     plan: starter
+    dockerBuildArgs:
+      - NEXT_PUBLIC_SUPABASE_URL
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY
     envVars:
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
