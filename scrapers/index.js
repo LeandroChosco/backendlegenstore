@@ -16,8 +16,14 @@ async function runAll() {
     console.log('\nIniciando Chrome (headless)...')
     browser = await chromium.launch({
       headless: true,
-      channel: 'chrome',
-      args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',   // evita crash en Docker (/dev/shm limitado a 64MB)
+        '--disable-gpu',
+        '--single-process',          // un solo proceso en vez de varios — reduce RAM ~40%
+        '--disable-blink-features=AutomationControlled',
+      ],
     })
 
     const scrapers = [
