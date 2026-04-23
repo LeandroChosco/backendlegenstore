@@ -21,9 +21,9 @@ async function runRunescape(browser) {
     { name: 'currency',      value: 'USD', domain: 'www.g2g.com', path: '/' },
   ])
 
-  await page.goto(LISTING_URL, { waitUntil: 'domcontentloaded', timeout: 45000 })
-  await page.waitForTimeout(4000)  // esperar que Vue/Quasar renderice el contenido
-  await page.waitForSelector('.text-body1.ellipsis-2-lines', { timeout: 30000 })
+  await page.goto(LISTING_URL, { waitUntil: 'domcontentloaded', timeout: 20000 })
+  await page.waitForTimeout(3000)
+  await page.waitForSelector('.text-body1.ellipsis-2-lines', { timeout: 15000 })
 
   const cardHref = await page.evaluate(() => {
     const el = document.querySelector('.text-body1.ellipsis-2-lines span')
