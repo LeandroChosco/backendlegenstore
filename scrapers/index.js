@@ -19,9 +19,8 @@ async function runAll() {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',   // evita crash en Docker (/dev/shm limitado a 64MB)
+        '--disable-dev-shm-usage',
         '--disable-gpu',
-        '--single-process',          // un solo proceso en vez de varios — reduce RAM ~40%
         '--disable-blink-features=AutomationControlled',
       ],
     })
