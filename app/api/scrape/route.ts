@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { exec } from 'child_process'
-import { promisify } from 'util'
 import path from 'path'
 
 export const runtime = 'nodejs'
-
-const execAsync = promisify(exec)
 
 export async function GET(request: NextRequest) {
   const key = request.nextUrl.searchParams.get('key')
@@ -16,23 +13,15 @@ export async function GET(request: NextRequest) {
 
   const scraperPath = path.join(process.cwd(), 'scrapers', 'index.js')
 
-  try {
-    const { stdout, stderr } = await execAsync(`node ${scraperPath}`, {
-      timeout: 120_000,
-      env: process.env,
-    })
+  // Fire and forget — responder inmediato antes del timeout de Render (30s)
+  // El resultado aparece en los logs del servicio en Render
+  exec(`node ${scraperPath}`, { timeout: 180_000, env: process.env }, (error, stdout, stderr) => {
+    if (error) console.error('[scrape] FALLÓ:', error.message, '\n', stderr)
+    else console.log('[scrape] OK:\n', stdout)
+  })
 
-    return NextResponse.json({
-      ok: true,
-      output: stdout,
-      warnings: stderr || null,
-    })
-  } catch (error) {
-    const err = error as { message: string; stdout?: string; stderr?: string }
-    return NextResponse.json({
-      ok: false,
-      error: err.message,
-      output: err.stdout ?? null,
-    }, { status: 500 })
-  }
+  return NextResponse.json({
+    ok: true,
+    message: 'Scraper iniciado en background. Revisá los logs en Render → Logs.',
+  })
 }
