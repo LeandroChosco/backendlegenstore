@@ -1,5 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env.local') })
-const { chromium } = require('playwright')
+const { chromium } = require('playwright-extra')
+const stealth = require('puppeteer-extra-plugin-stealth')
+chromium.use(stealth())
 const { runWowTbc } = require('./wow-tbc')
 const { runWowMidnight } = require('./wow-midnight')
 const { runRunescape } = require('./runescape')
