@@ -16,6 +16,8 @@ services:
         sync: false
       - key: NODE_ENV
         value: production
+      - key: SCRAPE_SECRET
+        sync: false
 
   # Scraper de precios — se ejecuta cada 10 minutos
   - type: cron
