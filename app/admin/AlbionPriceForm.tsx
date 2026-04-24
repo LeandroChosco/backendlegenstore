@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { updateAlbionPrice } from './actions/prices'
+import MarkupInput from './MarkupInput'
 
 interface Props {
   type: 'buyer' | 'seller'
   label: string
   currentPrice: number
+  currentMarkup: number
   updatedAt?: string
 }
 
-export default function AlbionPriceForm({ type, label, currentPrice, updatedAt }: Props) {
+export default function AlbionPriceForm({ type, label, currentPrice, currentMarkup, updatedAt }: Props) {
   const [value, setValue] = useState(String(currentPrice))
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -71,6 +73,12 @@ export default function AlbionPriceForm({ type, label, currentPrice, updatedAt }
       </div>
 
       {error && <p style={s.error}>{error}</p>}
+
+      <div style={s.markupRow}>
+        <span style={s.markupLabel}>Markup</span>
+        <MarkupInput game="albion" server={type} currentMarkup={currentMarkup} />
+      </div>
+
       {formattedDate && <p style={s.updatedAt}>Actualizado: {formattedDate}</p>}
     </div>
   )
@@ -89,5 +97,7 @@ const s: Record<string, React.CSSProperties> = {
   btnSaved: { background: '#22c55e', color: '#fff' },
   btnDisabled: { background: '#555', cursor: 'not-allowed' },
   error: { margin: '8px 0 0', fontSize: '12px', color: '#ef4444' },
+  markupRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #2a2a2a' },
+  markupLabel: { fontSize: '12px', color: '#666' },
   updatedAt: { margin: '8px 0 0', fontSize: '11px', color: '#555' },
 }

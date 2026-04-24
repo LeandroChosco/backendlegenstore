@@ -17,3 +17,18 @@ export async function updateAlbionPrice(server: 'buyer' | 'seller', price_usd: n
   revalidatePath('/admin')
   revalidatePath('/api/prices')
 }
+
+export async function updateMarkup(game: string, server: string, markup_pct: number) {
+  if (isNaN(markup_pct)) throw new Error('Porcentaje inválido')
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('prices')
+    .update({ markup_pct })
+    .eq('game', game)
+    .eq('server', server)
+
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin')
+  revalidatePath('/api/prices')
+}

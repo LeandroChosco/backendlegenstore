@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import AlbionPriceForm from './AlbionPriceForm'
+import MarkupInput from './MarkupInput'
 
 const GAME_LABELS: Record<string, string> = {
   albion: 'Albion Online',
@@ -61,12 +62,14 @@ export default async function AdminPage() {
               type="buyer"
               label="Compradores"
               currentPrice={albionBuyer?.price_usd ?? 0.25}
+              currentMarkup={albionBuyer?.markup_pct ?? 0}
               updatedAt={albionBuyer?.updated_at}
             />
             <AlbionPriceForm
               type="seller"
               label="Vendedores"
               currentPrice={albionSeller?.price_usd ?? 0.18}
+              currentMarkup={albionSeller?.markup_pct ?? 0}
               updatedAt={albionSeller?.updated_at}
             />
           </div>
@@ -85,7 +88,8 @@ export default async function AdminPage() {
                   <th style={s.th}>Juego</th>
                   <th style={s.th}>Servidor</th>
                   <th style={s.th}>Región</th>
-                  <th style={{ ...s.th, textAlign: 'right' }}>Precio USD</th>
+                  <th style={{ ...s.th, textAlign: 'right' }}>Precio base</th>
+                  <th style={{ ...s.th, textAlign: 'right' }}>Markup %</th>
                   <th style={{ ...s.th, textAlign: 'right' }}>Actualizado</th>
                 </tr>
               </thead>
@@ -101,6 +105,9 @@ export default async function AdminPage() {
                     <td style={{ ...s.td, color: '#888' }}>{row.region}</td>
                     <td style={{ ...s.td, textAlign: 'right', fontFamily: 'monospace', color: '#e8c547' }}>
                       ${Number(row.price_usd).toFixed(6)}
+                    </td>
+                    <td style={{ ...s.td }}>
+                      <MarkupInput game={row.game} server={row.server} currentMarkup={row.markup_pct ?? 0} />
                     </td>
                     <td style={{ ...s.td, textAlign: 'right', color: '#666', fontSize: '12px' }}>
                       {row.updated_at ? formatDate(row.updated_at) : '—'}
