@@ -24,6 +24,10 @@ export default function MarkupInput({ game, server, currentMarkup }: Props) {
       await updateMarkup(game, server, pct)
       setSaved(true)
       setTimeout(() => setSaved(false), 1500)
+    } catch (e) {
+      console.error('updateMarkup error:', e)
+      setError(true)
+      setTimeout(() => setError(false), 2000)
     } finally {
       setSaving(false)
     }
